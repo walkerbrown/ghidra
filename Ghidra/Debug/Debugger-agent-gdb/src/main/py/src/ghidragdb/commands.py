@@ -296,10 +296,12 @@ def start_trace(name: str) -> None:
     frame = inspect.currentframe()
     if frame is None:
         raise AssertionError("cannot locate schema.xml")
+
     parent = os.path.dirname(inspect.getfile(frame))
     schema_fn = os.path.join(parent, 'schema.xml')
     with open(schema_fn, 'r') as schema_file:
         schema_xml = schema_file.read()
+
     with STATE.trace.open_tx("Create Root Object"):
         root = STATE.trace.create_root_object(schema_xml, 'GdbSession')
         root.set_value('_display', 'GNU gdb ' + util.GDB_VERSION.full)
