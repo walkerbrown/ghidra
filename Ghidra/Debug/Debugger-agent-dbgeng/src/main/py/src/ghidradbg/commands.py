@@ -245,10 +245,8 @@ def start_trace(name: str) -> None:
     if frame is None:
         raise AssertionError("cannot locate schema.xml")
     parent = os.path.dirname(inspect.getfile(frame))
-    if util.is_exdi():
-        schema_fn = os.path.join(parent, 'schema_exdi.xml')
-    else:
-        schema_fn = os.path.join(parent, 'schema.xml')
+    schema_fn = os.path.join(parent, 'schema_exdi.xml' if util.is_exdi() else 'schema.xml')
+
     with open(schema_fn, 'r') as schema_file:
         schema_xml = schema_file.read()
     using_dbgmodel = os.getenv('OPT_USE_DBGMODEL') == "true"
