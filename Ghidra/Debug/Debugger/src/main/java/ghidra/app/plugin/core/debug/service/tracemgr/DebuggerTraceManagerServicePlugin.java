@@ -105,8 +105,11 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 	public static final String NEW_TRACES_FOLDER_NAME = "New Traces";
 
 	class ListenerForTraceChanges extends TraceDomainObjectListener
-			implements DomainObjectFileListener {
+			implements DomainObjectFileListener, TransactionListener {
 		private final Trace trace;
+
+		// Put txEnd logic in this listener, since it's already well-managed gc-wise.
+		private volatile CompletableFuture<Void> txEnd;
 
 		public ListenerForTraceChanges(Trace trace) {
 			this.trace = trace;
@@ -170,33 +173,17 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 			}
 			contextChanged();
 		}
-	}
-
-	static class TransactionEndFuture extends CompletableFuture<Void>
-			implements TransactionListener {
-		final Trace trace;
-
-		public TransactionEndFuture(Trace trace) {
-			this.trace = trace;
-			this.trace.addTransactionListener(this);
-			if (this.trace.getCurrentTransactionInfo() == null) {
-				complete(null);
-			}
-		}
 
 		@Override
 		public void transactionStarted(DomainObjectAdapterDB domainObj, TransactionInfo tx) {
 		}
 
 		@Override
-		public boolean complete(Void value) {
-			trace.removeTransactionListener(this);
-			return super.complete(value);
-		}
-
-		@Override
-		public void transactionEnded(DomainObjectAdapterDB domainObj) {
-			complete(null);
+		public synchronized void transactionEnded(DomainObjectAdapterDB domainObj) {
+			if (txEnd != null) {
+				txEnd.complete(null);
+				txEnd = null;
+			}
 		}
 
 		@Override
@@ -206,9 +193,24 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 		@Override
 		public void undoRedoOccurred(DomainObjectAdapterDB domainObj) {
 		}
+
+		public synchronized CompletableFuture<Void> waitTxEnd() {
+			if (trace.getCurrentTransactionInfo() == null) {
+				return AsyncUtils.nil();
+			}
+			if (txEnd == null) {
+				txEnd = new CompletableFuture<>();
+			}
+			/**
+			 * We're in a synchronized block on the same monitor as transactionEnded, so we can be
+			 * sure that if the transaction ends between checking tx info and creating "txEnd", that
+			 * the callback is waiting on this lock and will complete the future.
+			 */
+			return txEnd;
+		}
 	}
 
-	// TODO: This is a bit out of this manager's bounds, but acceptable for now.
+	// LATER: This is a bit out of this manager's bounds, but acceptable for now.
 	class ForTargetsListener implements TargetPublicationListener {
 		@Override
 		public void targetPublished(Target target) {
@@ -217,7 +219,13 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 
 		public CompletableFuture<Void> waitUnlockedDebounced(Target target) {
 			Trace trace = target.getTrace();
-			return new TransactionEndFuture(trace)
+			ListenerForTraceChanges listener = listenersByTrace.get(trace);
+			if (listener == null) {
+				Msg.warn(this, "Waiting on a target whose trace is not managed: %s, %s".formatted(
+					target, trace));
+				return AsyncUtils.nil();
+			}
+			return listener.waitTxEnd()
 					.thenCompose(__ -> AsyncTimer.DEFAULT_TIMER.mark().after(100))
 					.thenComposeAsync(__ -> {
 						if (trace.isLocked()) {
@@ -867,6 +875,7 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 			listenersByTrace.put(trace, listener);
 			trace.addListener(listener);
 			trace.addDomainFileListener(listener);
+			trace.addTransactionListener(listener);
 		}
 		contextChanged();
 		firePluginEvent(new TraceOpenedPluginEvent(getName(), trace));
@@ -1032,7 +1041,7 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 			ListenerForTraceChanges listener = listenersByTrace.remove(trace);
 			trace.removeListener(listener);
 			trace.removeDomainFileListener(listener);
-			//Msg.debug(this, "Remaining Consumers of " + trace + ": " + trace.getConsumerList());
+			trace.removeTransactionListener(listener);
 		}
 		try {
 			if (current.getTrace() == trace) {
@@ -1120,6 +1129,7 @@ public class DebuggerTraceManagerServicePlugin extends Plugin
 				ListenerForTraceChanges listener = listenersByTrace.get(trace);
 				trace.removeListener(listener);
 				trace.removeDomainFileListener(listener);
+				trace.removeTransactionListener(listener);
 				it.remove();
 			}
 			// Be certain
