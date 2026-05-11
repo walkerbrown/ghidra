@@ -504,8 +504,12 @@ public class DebuggerEmulationServicePlugin extends Plugin implements DebuggerEm
 			!ProgramEmulationUtils.isEmulatedProgram(current.getTrace())) {
 			return false;
 		}
+		ProgramLocation programLoc = ctx.getLocation();
+		if (programLoc == null) {
+			return false;
+		}
 		TraceLocation traceLoc = staticMappings.getOpenMappedLocation(
-			current.getTrace(), ctx.getLocation(), current.getSnap());
+			current.getTrace(), programLoc, current.getSnap());
 		if (traceLoc == null) {
 			return false;
 		}
