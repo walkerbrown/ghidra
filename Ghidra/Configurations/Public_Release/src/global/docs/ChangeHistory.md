@@ -132,6 +132,7 @@
 * _Logging_. Fixed a bug that prevented GhidraScript output from being directed to either the default or user-specified `script.log` file. (GP-6532)
 * _Memory_. Corrected various issues related to improper use of Addresses from one program in another program's AddressMap. (GP-6150)
 * _Multi-User_. Corrected potential security concern with Ghidra Server PKI Authentication.  If using PKI Authentication mode (`-a2`) for the server install, the user should upgrade the server.  See reported Ghidra GitHub Pull Request #9109 for more details. (GP-6678, Issue #9109)
+* _Multi-User_. Added Ghidra Server `-ipAlt` option to address self-signed certificate issues affecting docker container deployments where an formal certificate was not used (see `server.conf` and `svrREADME.md`. (GP-6811)
 * _Processors_. Fixed ARM `ldrsh.w` and `ldrsb.w` instruction semantics. (GP-4651, Issue #6564)
 * _Processors_. Reworded Tricore processor description. (GP-5243, Issue #7170)
 * _Processors_. Corrected AVR32 `ICALL` instruction behavior when `rd0` is the `LR` register. (GP-5306, Issue #5718)
