@@ -798,9 +798,10 @@ public class FunctionEditorModel {
 				function.setName(name, SourceType.USER_DEFINED);
 			}
 
-			Namespace namespace = functionData.getNamespace();
-			if (!namespace.equals(function.getParentNamespace())) {
-				function.setParentNamespace(namespace);
+			Namespace newNamespace = functionData.getNamespace();
+			Namespace currentNamespace = function.getParentNamespace();
+			if (!Objects.equals(newNamespace, currentNamespace)) {
+				function.setParentNamespace(newNamespace);
 			}
 
 			boolean isInline = functionData.isInline();
@@ -1057,7 +1058,7 @@ public class FunctionEditorModel {
 	private Namespace createNamespace(SymbolPath path) throws ParseException {
 
 		if (path == null) {
-			return null;
+			return program.getGlobalNamespace();
 		}
 
 		String nsText = path.getPath();
