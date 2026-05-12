@@ -600,7 +600,8 @@ public class GhidraServer extends UnicastRemoteObject implements GhidraServerHan
 					hostname = s.substring(6);
 				}
 				for (String h : hostname.trim().split(";")) {
-					if (hostname.length() == 0 || hostname.startsWith("-")) {
+					h = h.trim();
+					if (h.length() == 0 || h.startsWith("-")) {
 						displayUsage("Missing -ipAlt altName");
 						System.exit(-1);
 					}
