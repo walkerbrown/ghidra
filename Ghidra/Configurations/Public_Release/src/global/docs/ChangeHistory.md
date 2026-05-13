@@ -170,7 +170,7 @@
 * _Data Types_. Corrected Structure `insertAtOffset` behavior when inserting at an offset which 
   precedes a zero-length component. (GP-6576)
 * _Data Types_. Corrected upgrade failure which can occur for Project Data Type Archives. (GP-6649)
-* _Data Types_. Fixed `CreateUEFIGDTAarchivesScript`, which parses UEFI header files for extracting 
+* _Data Types_. Fixed `CreateUEFIGDTArchivesScript`, which parses UEFI header files for extracting 
   data types. (GP-6690)
 * _Debugger_. Fixed bug in the tree logic encountered when searching for an appropriate Trace 
   Object. (GP-6173, Issue #8702)
@@ -183,7 +183,7 @@
 * _Debugger:Agents_. Provided better end-of-life story for the x64dbg agent. (GP-6148)
 * _Debugger:Agents_. Changed Debugger defaults to listen on localhost rather than all interfaces. 
   (GP-6716)
-* _Debugger:Breakpoints_. Fixed a `ClosedException` in the logical breakpoint serivce. (GP-6572, 
+* _Debugger:Breakpoints_. Fixed a `ClosedException` in the logical breakpoint service. (GP-6572, 
   Issue #8904)
 * _Debugger:dbgeng.dll_. Handlers should not force break. They now return `DEBUG_STATUS_NO_CHANGE`. 
   (GP-6190, Issue #8738)
@@ -196,7 +196,7 @@
   Issue #8736)
 * _Decompiler_. Fixed a bug in the Decompiler when analyzing expressions of the form 
   `val & bitmask >> const != 0`. (GP-6318, Issue #8717, #8718)
-* _Decompiler_. Fixed infinite loop triggered during multistage jumptable analysis. (GP-6610, 
+* _Decompiler_. Fixed infinite loop triggered during multistage jump table analysis. (GP-6610, 
   Issue #8968)
 * _Decompiler_. Updated the Decompiler to not re-decompile when creating a snapshot of the current 
   function. (GP-6629)
@@ -251,7 +251,7 @@
 * _Processors_. Added several missing ARM v8m instructions. (GP-6145, Issue #8652)
 * _Processors_. Corrected PIC-18 disassembly for certain addressing modes when the destination 
   operand is a banked register. (GP-6591, Issue #9051)
-* _Processors_. Corrected disassembly error with ARM neon `vmov.i32` instruction. (GP-6750)
+* _Processors_. Corrected disassembly error with ARM Neon `vmov.i32` instruction. (GP-6750)
 * _Project_. Eliminated the maximum 60-character length naming restriction imposed on various Ghidra 
   elements, including: project name, repository name,  project archive filename, and Ghidra tool 
   config names.  Efforts have been made to allow for the use of foreign-language-naming of these 
@@ -2131,7 +2131,7 @@ Added API method `Structure.setLength(int length)` which allows the size of a no
 * _Processors_. Fixed operand parsing of ARM Neon `vld` and `vst` instructions. (GP-3043, Issue #4814)
 * _Processors_. Corrected x86 `MOV REX, MOFFS64` disassembly with address size prefix. (GP-3078, Issue #4942)
 * _Processors_. Corrected x86 `FBLD` instruction semantics. (GP-3079, Issue #2427)
-* _Processors_. Fixed ARM neon `VMOV.U16` instruction decode. (GP-3096)
+* _Processors_. Fixed ARM Neon `VMOV.U16` instruction decode. (GP-3096)
 * _Processors_. Fixed issue with ARM Thumb `push {register_list}` not disassembling when the last two registers in the list are `r2` and `r3`. (GP-3132, Issue #5024)
 * _Processors_. Supplied additional register field support to AARCH64 `MSR` instruction. (GP-3156)
 * _Processors_. Fixed issue with ARM Thumb Neon `vqdmull` instruction not disassembling. (GP-3157, Issue #5053)
@@ -2909,7 +2909,7 @@ Added API method `Structure.setLength(int length)` which allows the size of a no
 * _Processors_. Corrected semantics for MIPS `INS` instruction. (GP-1290, Issue #3405)
 * _Processors_. Corrected MIPS64 `DINS` instruction semantics. (GP-1291, Issue #2232)
 * _Processors_. Corrected semantics of PA-RISC shift conditions, which was incorrectly using the register size in bytes, as opposed to bits. (GP-1292)
-* _Processors_. Corrected ARM neon `vmrs` instruction disassembly. (GP-1322, Issue #3446)
+* _Processors_. Corrected ARM Neon `vmrs` instruction disassembly. (GP-1322, Issue #3446)
 * _Processors_. Corrected SuperH `bld` and `movemu` instruction semantics. (GP-1331, Issue #3449)
 * _Processors_. Removed deprecated ARM condition code 15. (GP-1332)
 * _Processors_. Corrected issue with x86 `call` instructions when stack pointer is used as a reference. (GP-1357, Issue #3455)
@@ -3273,7 +3273,7 @@ Added API method `Structure.setLength(int length)` which allows the size of a no
 * _PDB_. Changed return type applied to constructors by PDB Universal from `void` to `Undefined`, allowing the Decompiler to determine the type. (GP-791)
 * _Processors_. Added missing `RFE` instruction in MIPS up to version R3000. (GP-33, Issue #1766)
 * _Processors_. ARM instruction `VMUL` now decodes correctly. (GP-627, Issue #2677)
-* _Processors_. Added missing `CFINV` instruction to AARCH64 processor specification and added definitions for locals in neon instructions. (GP-655, Issue #2710)
+* _Processors_. Added missing `CFINV` instruction to AARCH64 processor specification and added definitions for locals in Neon instructions. (GP-655, Issue #2710)
 * _Scripting_. Fixed analyzeHeadless `-scriptPath` option that didn't work for Python and other non-Java scripts located in non-default directories. (GP-528, Issue #2561)
 * _Scripting_. Fixed concurrency issue with management of scripting bundle paths. (GP-576)
 * _Scripting_. Corrected handling for Ghidra Script files which are symlinks that were broken in Ghidra 9.2. (GP-650, Issue #2698)
@@ -3416,7 +3416,7 @@ Added API method `Structure.setLength(int length)` which allows the size of a no
 * _Processors_. Changed RISC-V jump instructions to the more appropriate `goto` instead of `call`. (GP-54, Issue #2120)
 * _Processors_. Updated AARCH64 to v8.5, including new MTE instructions. (GP-124)
 * _Processors_. Added support for floating point params and return for SH4 processor calling conventions. (GP-183, Issue #2218)
-* _Processors_. Added semantic support for many AARCH64 neon instructions. Addresses for register lanes are now precalculated, reducing the amount of p-code generated. (GP-343)
+* _Processors_. Added semantic support for many AARCH64 Neon instructions. Addresses for register lanes are now precalculated, reducing the amount of p-code generated. (GP-343)
 * _Processors_. Updated RISCV processor to include reorganization, new instructions, and fixes to several instructions. (GP-358, Issue #2333)
 * _Program API_. Improved multi-threaded ProgramDB access performance. (GT-3262)
 * _Scripting_. Improved ImportSymbolScript.py to import functions in addition to generic labels. (GT-3249, Issue #946)
