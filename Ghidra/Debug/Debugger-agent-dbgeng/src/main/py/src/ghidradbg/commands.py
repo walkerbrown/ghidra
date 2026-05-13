@@ -1074,10 +1074,10 @@ def put_single_breakpoint(bp, ibobj, nproc: int, ikeys: List[str]) -> None:
     if bp.GetType()[0] == DbgEng.DEBUG_BREAKPOINT_DATA:
         width, prot = bp.GetDataParameters()
         width = str(width)
-        prot = {4: 'HW_EXECUTE', 2: 'READ', 1: 'WRITE'}[prot]
+        prot = {4: 'X', 2: 'R', 1: 'W'}[prot]
     else:
         width = ' '
-        prot = 'SW_EXECUTE'
+        prot = 'x'
 
     if address is not None:  # Implies execution break
         base, addr = mapper.map(nproc, address)

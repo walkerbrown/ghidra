@@ -1103,22 +1103,22 @@ def put_single_breakpoint(b: gdb.Breakpoint, ibobj: TraceObject,
     brkobj.set_value('Enabled', b.enabled)
     if b.type == gdb.BP_BREAKPOINT:
         brkobj.set_value('Expression', b.location)
-        brkobj.set_value('Kinds', 'SW_EXECUTE')
+        brkobj.set_value('Kinds', 'x')
     elif b.type == gdb.BP_HARDWARE_BREAKPOINT:
         brkobj.set_value('Expression', b.location)
-        brkobj.set_value('Kinds', 'HW_EXECUTE')
+        brkobj.set_value('Kinds', 'X')
     elif b.type == gdb.BP_WATCHPOINT:
         brkobj.set_value('Expression', b.expression)
-        brkobj.set_value('Kinds', 'WRITE')
+        brkobj.set_value('Kinds', 'W')
     elif b.type == gdb.BP_HARDWARE_WATCHPOINT:
         brkobj.set_value('Expression', b.expression)
-        brkobj.set_value('Kinds', 'WRITE')
+        brkobj.set_value('Kinds', 'W')
     elif b.type == gdb.BP_READ_WATCHPOINT:
         brkobj.set_value('Expression', b.expression)
-        brkobj.set_value('Kinds', 'READ')
+        brkobj.set_value('Kinds', 'R')
     elif b.type == gdb.BP_ACCESS_WATCHPOINT:
         brkobj.set_value('Expression', b.expression)
-        brkobj.set_value('Kinds', 'READ,WRITE')
+        brkobj.set_value('Kinds', 'RW')
     else:
         brkobj.set_value('Expression', '(unknown)')
         brkobj.set_value('Kinds', '')
